@@ -2,6 +2,8 @@
 
 namespace TransferWise;
 
+use function array_merge;
+
 class Client
 {
 
@@ -78,7 +80,7 @@ class Client
      *
      * @return Json
      */
-    public function request($method, $path, $params = [])
+    public function request($method, $path, $params = [], $headers = [])
     {
 
         if (!$this->_http_client) {
@@ -88,15 +90,20 @@ class Client
         $data = [
             'headers' => [
                 'Authorization' => "Bearer $this->_token",
-                'Content-Type' => "application/json"
-            ]
+                'Content-Type'  => "application/json",
+            ],
         ];
 
-        if ($method == "PATCH") {
-            $data["headers"]["Content-Type"] = "application/merge-patch+json";
+        if ($headers) {
+            $data['headers'] = array_merge($headers, $data['headers']);
         }
 
-        if ((in_array($method, ["POST", "PUT", "PATCH"]))  && count($params) > 0) {
+        if ($method == "PATCH") {
+            $data["headers"]["Content-Type"]
+                = "application/merge-patch+json";
+        }
+
+        if ((in_array($method, ["POST", "PUT", "PATCH"])) && count($params) > 0) {
             $data["json"] = $params;
         }
 
@@ -114,13 +121,17 @@ class Client
     }
 
 
-    public function response($response)
-    {
+    public
+    function response(
+        $response
+    ) {
         return json_decode($response->getBody()->getContents(), true);
     }
 
-    public function handleErrors($exception)
-    {
+    public
+    function handleErrors(
+        $exception
+    ) {
         $code = $exception->getCode();
         $content = $exception->getResponse()->getBody()->getContents();
         $response = json_decode($content);
