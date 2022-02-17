@@ -7,7 +7,7 @@ class RecipientAccountService extends Service
     /**
      * Create a recipient account
      *
-     * @param Array $params 
+     * @param Array $params
      *
      * @return Response
      */
@@ -19,13 +19,14 @@ class RecipientAccountService extends Service
     /**
      * Create a recipient account
      *
-     * @param Array $query Paging params 
+     * @param Array $query Paging params
      *
      * @return Response
      */
     public function all($query = [])
     {
         $path = $this->withQuery("v2/accounts", $query);
+
         return $this->client->request("GET", $path);
     }
 
@@ -51,5 +52,15 @@ class RecipientAccountService extends Service
     public function delete($id)
     {
         return $this->client->request("DELETE", "v1/accounts/{$id}");
+    }
+
+    public function requirements(string $source, string $target, $sourceAmount)
+    {
+        return $this->client->request(
+            "GET",
+            "v1/account-requirements?source={$source}&target={$target}&sourceAmount={$sourceAmount}",
+            [],
+            ['Accept-Minor-Version' => "1"]
+        );
     }
 }
