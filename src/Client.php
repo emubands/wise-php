@@ -2,6 +2,8 @@
 
 namespace TransferWise;
 
+use GuzzleHttp\Psr7\Request;
+use Psr\Http\Message\ResponseInterface;
 use function array_merge;
 
 class Client
@@ -82,37 +84,42 @@ class Client
      */
     public function request($method, $path, $params = [], $headers = [])
     {
-
         if (!$this->_http_client) {
             $this->_http_client = new \GuzzleHttp\Client();
         }
 
-        $data = [
-            'headers' => [
-                'Authorization' => "Bearer $this->_token",
-                'Content-Type'  => "application/json",
-            ],
+        $defaultHeaders = [
+            'Authorization' => "Bearer $this->_token",
+            'Content-Type'  => 'application/json',
         ];
 
-        if ($headers) {
-            $data['headers'] = array_merge($headers, $data['headers']);
-        }
+        $mergedHeaders = array_merge($defaultHeaders, $headers);
 
         if ($method == "PATCH") {
-            $data["headers"]["Content-Type"]
-                = "application/merge-patch+json";
+            $mergedHeaders["Content-Type"] = "application/merge-patch+json";
         }
 
-        if ((in_array($method, ["POST", "PUT", "PATCH"])) && count($params) > 0) {
-            $data["json"] = $params;
+        $requestData = [
+            'headers' => $mergedHeaders,
+        ];
+
+        if (in_array($method, ["POST", "PUT", "PATCH"]) && !empty($params)) {
+            $requestData["json"] = $params;
         }
 
         try {
-            $response = $this->_http_client->request(
-                $method,
-                $this->_url . $path,
-                $data
-            );
+            if ($method == "POST") {
+                $requestData =  json_encode($params, JSON_FORCE_OBJECT);
+                $response = $this->_http_client->post($this->_url . $path, [
+                    'headers' => [
+                        'Content-Type'  => 'application/json',
+                        'Authorization' => "Bearer $this->_token",
+                    ],
+                    'body'    => $requestData,
+                ]);
+            } else {
+                $response = $this->_http_client->request($method, $this->_url . $path, $requestData);
+            }
         } catch (\GuzzleHttp\Exception\ClientException $exception) {
             return $this->handleErrors($exception);
         }
@@ -123,7 +130,7 @@ class Client
 
     public
     function response(
-        $response
+        ResponseInterface $response
     ) {
         return json_decode($response->getBody()->getContents(), true);
     }
