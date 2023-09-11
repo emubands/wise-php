@@ -54,12 +54,12 @@ class RecipientAccountService extends Service
         return $this->client->request("DELETE", "v1/accounts/{$id}");
     }
 
-    public function requirements(string $source, string $target, $sourceAmount)
+    public function findRequirements(string $source, string $target, string $sourceAmount, array $parameters = [])
     {
         return $this->client->request(
-            "GET",
-            "v1/account-requirements?source={$source}&target={$target}&sourceAmount={$sourceAmount}",
-            [],
+            "POST",
+            "v2/account-requirements?sourceCurrency={$source}&targetCurrency={$target}&sourceAmount={$sourceAmount}",
+            $parameters,
             ['Accept-Minor-Version' => "1"]
         );
     }
