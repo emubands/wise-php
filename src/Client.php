@@ -112,9 +112,9 @@ class Client
                 $requestData =  json_encode($params, JSON_FORCE_OBJECT);
                 $response = $this->_http_client->post($this->_url . $path, [
                     'headers' => [
-                        'Content-Type'  => 'application/json',
-                        'Authorization' => "Bearer $this->_token",
-                    ],
+                            'Content-Type'  => 'application/json',
+                            'Authorization' => "Bearer $this->_token",
+                        ] + $headers,
                     'body'    => $requestData,
                 ]);
             } else {

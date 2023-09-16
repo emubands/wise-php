@@ -29,20 +29,6 @@ class QuoteService extends Service
         return $this->client->request("POST", "v2/quotes", $params);
     }
 
-
-    /**
-     * Get Account Requirements for quote
-     *
-     * @param Int   $id     Quote Id
-     * @param Array $params parameters needed to create a temporary quote
-     *
-     * @return Response
-     */
-    public function accountRequirements($id, $params)
-    {
-        return $this->client->request("POST", "v1/quotes/{$id}/account-requirements", $params);
-    }
-
     /**
      * Update Quote
      *
