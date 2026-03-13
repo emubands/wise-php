@@ -38,7 +38,7 @@ class Client
             }
 
             if (isset($config["env"]) && $config["env"] == "sandbox") {
-                $this->_url = "https://api.sandbox.transferwise.tech/";
+                $this->_url = "https://api.wise-sandbox.com/";
             }
 
             return;
