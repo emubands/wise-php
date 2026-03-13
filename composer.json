@@ -1,5 +1,5 @@
 {
-    "name": "transferwise/wise-php",
+    "name": "emubands/wise-php",
     "description": "Wise PHP Library",
     "type": "library",
     "require": {
